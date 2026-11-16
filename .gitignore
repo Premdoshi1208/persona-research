@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env*
+!.env.example
+infra/state.json
+infra/*secret*
+test-results/
+playwright-report/
+*.log
+.artifacts/
+
+infra/render-owners.json
+.DS_Store

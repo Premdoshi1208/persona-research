@@ -1,0 +1,80 @@
+{
+  "verifiedAt": "2026-11-16T07:43:38.644Z",
+  "requests": [
+    {
+      "name": "model availability",
+      "status": 200,
+      "elapsedMs": 115,
+      "requestId": "req_01m7hmzhqeeagv228zkg3nya41"
+    },
+    {
+      "name": "structured reasoning",
+      "status": 200,
+      "elapsedMs": 325,
+      "requestId": "req_01m7hmzhs6e7qazgaw1knxar8y",
+      "output": {
+        "status": "ok",
+        "nextQuestion": "How does remote working impact employee productivity?"
+      },
+      "usage": {
+        "queue_time": 0.167409087,
+        "prompt_tokens": 122,
+        "prompt_time": 0.004798441,
+        "completion_tokens": 51,
+        "completion_time": 0.105069085,
+        "total_tokens": 173,
+        "total_time": 0.109867526,
+        "completion_tokens_details": {
+          "reasoning_tokens": 25
+        }
+      }
+    },
+    {
+      "name": "generated speech",
+      "status": 200,
+      "elapsedMs": 208,
+      "requestId": "req_01m7hmzj3fereas3m7e3xqaw8w",
+      "bytes": 656710,
+      "signature": "RIFF",
+      "inputCharacters": 190
+    },
+    {
+      "name": "speech recognition",
+      "status": 200,
+      "elapsedMs": 309,
+      "requestId": "req_01m7hmzm8je3gsa49rgyxbbjw7",
+      "output": {
+        "text": " As a remote worker, I struggle with switching between too many tools. I spend an hour each day updating tasks. I would pay for one simple place to see priorities and focus on important work.",
+        "x_groq": {
+          "id": "req_01m7hmzm8je3gsa49rgyxbbjw7"
+        }
+      }
+    }
+  ],
+  "docs": [
+    "https://console.groq.com/docs/models",
+    "https://console.groq.com/docs/speech-to-text",
+    "https://console.groq.com/docs/text-to-speech/orpheus"
+  ],
+  "availableModels": [
+    "openai/gpt-oss-safeguard-20b",
+    "whisper-large-v3",
+    "openai/gpt-oss-20b",
+    "openai/gpt-oss-120b",
+    "allam-2-7b",
+    "canopylabs/orpheus-arabic-saudi",
+    "meta-llama/llama-prompt-guard-2-86m",
+    "qwen/qwen3.8-27b",
+    "whisper-large-v3-turbo",
+    "meta-llama/llama-prompt-guard-2-22m",
+    "canopylabs/orpheus-v1-english"
+  ],
+  "selectedModels": {
+    "reasoning": "openai/gpt-oss-120b",
+    "conversation": "openai/gpt-oss-20b",
+    "stt": "whisper-large-v3-turbo",
+    "tts": "canopylabs/orpheus-v1-english",
+    "voice": "autumn"
+  },
+  "passed": true
+}

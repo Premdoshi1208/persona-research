@@ -1,0 +1,111 @@
+{
+  "base": "http://localhost:3005",
+  "verifiedAt": "2026-11-16T08:19:01.592Z",
+  "checks": [
+    {
+      "name": "fresh guest workspace with genuine zero metrics",
+      "passed": true
+    },
+    {
+      "name": "AI campaign generation and review/edit/save",
+      "passed": true,
+      "questionCount": 5
+    },
+    {
+      "name": "published shared interview link",
+      "passed": true,
+      "campaignId": "791eda8a-e074-4d23-82e6-05e39d656015"
+    },
+    {
+      "name": "two independent MediaRecorder/Groq voice interviews with personalized followups",
+      "passed": true,
+      "participants": [
+        {
+          "id": "5a8cf44f-28cc-4542-8f07-57389d004759",
+          "transcription": "As a remote worker, I struggle with switching between too many tools. I spend an hour each day updating tasks. I would pay for one simple place to see priorities and focus on important work.",
+          "followUp": "Which specific tools do you use for task coordination, and can you describe a recent instance where switching between them caused a delay or confusion?",
+          "audioPlayback": [
+            {
+              "event": "playing",
+              "src": "blob:http://localhost:3005/b15b81d2-305b-44ee-8ac9-1330d8703fab",
+              "time": 0,
+              "duration": 8.799833
+            },
+            {
+              "event": "ended",
+              "time": 8.799833,
+              "duration": 8.799833
+            },
+            {
+              "event": "playing",
+              "src": "blob:http://localhost:3005/3b9b95e8-4699-4ba4-bd49-47af3631869a",
+              "time": 0,
+              "duration": 10.719833
+            },
+            {
+              "event": "ended",
+              "time": 10.719833,
+              "duration": 10.719833
+            }
+          ],
+          "independentContext": true
+        },
+        {
+          "id": "d8a271d1-462b-4dcd-a10a-d47172e55646",
+          "transcription": "I manage a small remote team. Our biggest problem is unclear priorities, not tools. We use one shared document and it works. I would pay for better planning, but not another task app. I manage a small remote team.",
+          "followUp": "You mentioned unclear priorities as the biggest problem. Can you give a specific example of a recent project where this uncertainty caused a challenge for your team, and how you tried to resolve it?",
+          "audioPlayback": [
+            {
+              "event": "playing",
+              "src": "blob:http://localhost:3005/1470a10a-4f58-4fed-96fc-33176d7dcb2d",
+              "time": 0,
+              "duration": 11.359833
+            },
+            {
+              "event": "ended",
+              "time": 11.359833,
+              "duration": 11.359833
+            },
+            {
+              "event": "playing",
+              "src": "blob:http://localhost:3005/3da84bcf-de27-4cc6-abfc-cf4ab950ac69",
+              "time": 0,
+              "duration": 15.839667
+            },
+            {
+              "event": "ended",
+              "time": 15.839667,
+              "duration": 15.839667
+            }
+          ],
+          "independentContext": true
+        }
+      ]
+    },
+    {
+      "name": "recoverable jobs, combined findings and exact quotes",
+      "passed": true,
+      "participantCount": 2,
+      "themes": 7
+    },
+    {
+      "name": "persisted research assistant grounded in actual evidence",
+      "passed": true
+    },
+    {
+      "name": "real PDF/CSV downloads, public sharing/revocation and unauthorized isolation",
+      "passed": true
+    },
+    {
+      "name": "workspace and interviews persist after refresh; genuine agent history",
+      "passed": true
+    },
+    {
+      "name": "mobile responsive landing and mobile second interview",
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "passed": true,
+  "limits": "Synthetic spoken WAV injected into Chromium microphone; real hardware, Safari and iOS playback not independently tested."
+}

@@ -1,0 +1,7 @@
+{
+  "verifiedAt": "2026-11-16T07:44:05.237Z",
+  "connected": true,
+  "version": "PostgreSQL 17.12 (14c6cec) on aarch64-unknown-linux-gnu",
+  "database": "neondb",
+  "serverStarted": "2026-11-16T07:40:55.298Z"
+}

@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: persona-research-beta
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeployTrigger: off
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: DATABASE_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: GROQ_REASONING_MODEL
+        value: openai/gpt-oss-120b
+      - key: GROQ_CONVERSATION_MODEL
+        value: openai/gpt-oss-20b
+      - key: GROQ_STT_MODEL
+        value: whisper-large-v3-turbo
+      - key: GROQ_TTS_MODEL
+        value: canopylabs/orpheus-v1-english
+      - key: GROQ_TTS_VOICE
+        value: autumn
+      - key: DAILY_GLOBAL_AI_REQUESTS
+        value: '1500'
+      - key: DAILY_WORKSPACE_AI_REQUESTS
+        value: '200'
+      - key: MAX_INTERVIEW_TURNS
+        value: '10'
+      - key: MAX_CONCURRENT_INTERVIEWS
+        value: '5'
+      - key: MAX_AUDIO_MB
+        value: '12'
+      - key: MAX_AUDIO_BYTES
+        value: '12582912'
+      - key: DAILY_GLOBAL_SPEECH_CHARACTERS
+        value: '75000'
+      - key: DAILY_WORKSPACE_SPEECH_CHARACTERS
+        value: '20000'
+      - key: MAX_LLM_OUTPUT_TOKENS
+        value: '6000'
+      - key: AGENT_ATTEMPTS
+        value: '2'

@@ -1,0 +1,98 @@
+{
+  "verifiedAt": "2026-11-16T07:42:00.184Z",
+  "requests": [
+    {
+      "name": "model availability",
+      "status": 200,
+      "elapsedMs": 153,
+      "requestId": "req_01m7hmwhkpe0kv48pyczqapcbv"
+    },
+    {
+      "name": "structured reasoning",
+      "status": 200,
+      "elapsedMs": 382,
+      "requestId": "req_01m7hmwhp2ef192wjxhhdftyhb",
+      "output": {
+        "status": "ok",
+        "nextQuestion": "How does remote working impact employee productivity?"
+      },
+      "usage": {
+        "queue_time": 0.199616472,
+        "prompt_tokens": 122,
+        "prompt_time": 0.005434763,
+        "completion_tokens": 50,
+        "completion_time": 0.104909825,
+        "total_tokens": 172,
+        "total_time": 0.110344588,
+        "completion_tokens_details": {
+          "reasoning_tokens": 24
+        }
+      }
+    },
+    {
+      "name": "generated speech",
+      "status": 400,
+      "elapsedMs": 66,
+      "requestId": "req_01m7hmwj1xe3nsw8y02ya3ypay",
+      "error": "{\"error\":{\"message\":\"The model `canopylabs/orpheus-v1-english` requires terms acceptance. Please have the org admin accept the terms at https://console.groq.com/playground?model=canopylabs%2Forpheus-v1-english\",\"type\":\"invalid_request_error\",\"code\":\"model_terms_required\"}}\n"
+    },
+    {
+      "name": "speech recognition",
+      "status": 200,
+      "elapsedMs": 407,
+      "fixture": "tests/fixtures/participant.wav",
+      "fixtureSource": "macOS Samantha generated speech, 16kHz mono WAV",
+      "output": {
+        "text": " As a remote worker, I struggle with switching between too many tools. I spend an hour each day updating tasks. I would pay for one simple place to see priorities and focus on important work.",
+        "x_groq": {
+          "id": "req_01m7hmxfh9e7y8tv7rywketm4p"
+        }
+      }
+    },
+    {
+      "name": "low latency conversational reasoning",
+      "status": 200,
+      "elapsedMs": 325,
+      "output": {
+        "question": "What would help you keep track of tasks across those tools?"
+      },
+      "usage": {
+        "queue_time": 0.11405107,
+        "prompt_tokens": 149,
+        "prompt_time": 0.009865713,
+        "completion_tokens": 39,
+        "completion_time": 0.04130054,
+        "total_tokens": 188,
+        "total_time": 0.051166253,
+        "completion_tokens_details": {
+          "reasoning_tokens": 14
+        }
+      }
+    }
+  ],
+  "docs": [
+    "https://console.groq.com/docs/models",
+    "https://console.groq.com/docs/speech-to-text",
+    "https://console.groq.com/docs/text-to-speech/orpheus"
+  ],
+  "availableModels": [
+    "whisper-large-v3",
+    "canopylabs/orpheus-arabic-saudi",
+    "canopylabs/orpheus-v1-english",
+    "meta-llama/llama-prompt-guard-2-22m",
+    "meta-llama/llama-prompt-guard-2-86m",
+    "openai/gpt-oss-120b",
+    "qwen/qwen3.8-27b",
+    "whisper-large-v3-turbo",
+    "allam-2-7b",
+    "openai/gpt-oss-20b",
+    "openai/gpt-oss-safeguard-20b"
+  ],
+  "selectedModels": {
+    "reasoning": "openai/gpt-oss-120b",
+    "conversation": "openai/gpt-oss-20b",
+    "stt": "whisper-large-v3-turbo",
+    "tts": "canopylabs/orpheus-v1-english",
+    "voice": "autumn"
+  }
+}

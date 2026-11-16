@@ -1,0 +1,25 @@
+{
+  "verifiedAt": "2026-11-16T08:07:54.159Z",
+  "database": "real PostgreSQL",
+  "providerCalls": 0,
+  "checks": [
+    "Database health, security headers, and anonymous access controls",
+    "Independent guest workspaces, HTTP-only cookies, and session persistence",
+    "CSRF, origin, and Zod input validation",
+    "Campaign CRUD, question order, publication, pause/resume, and duplication",
+    "Cross-workspace read/write/export/assistant authorization",
+    "Transactional campaign quota and safe deletion",
+    "Guest conversion, bcrypt hashes, recovery code, and old-session invalidation",
+    "Login, password changes, and revocation of other sessions",
+    "Recovery-code rotation and invalidation of previous sessions",
+    "Real database metrics, PDF bytes, and CSV download",
+    "Read-only aggregate public reports omit transcripts, identities, and private notes",
+    "Share-link rotation and immediate revocation",
+    "Secret and credential-hash non-disclosure",
+    "Logout and invalidation of the previous session cookie",
+    "Campaign closure/deletion and foreign-key cascades",
+    "Account/workspace deletion and session invalidation"
+  ],
+  "passed": true,
+  "cleanup": "Dedicated QA workspaces and user removed"
+}

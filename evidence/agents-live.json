@@ -1,0 +1,117 @@
+{
+  "verifiedAt": "2026-11-16T07:48:34.681Z",
+  "scope": "Live Groq SDK and PostgreSQL integration; generated WAV fixtures stand in for microphone input.",
+  "checks": [
+    {
+      "name": "Research Strategist",
+      "passed": true,
+      "questionCount": 6
+    },
+    {
+      "name": "Groq generated interviewer speech",
+      "passed": true,
+      "segments": 1,
+      "bytes": 503110
+    },
+    {
+      "name": "Participant 1 actual WAV transcription",
+      "passed": true,
+      "transcript": "I spend an hour every Friday copying tasks between Slack and a spreadsheet. Last week I missed a deadline because the project status was out of date."
+    },
+    {
+      "name": "Participant 1 actual WAV transcription",
+      "passed": true,
+      "transcript": "I want one view of priorities that updates automatically. I would try a tool for a week before paying, and my main concern is setup time."
+    },
+    {
+      "name": "Participant 1 grounded analysis",
+      "passed": true,
+      "findings": 4
+    },
+    {
+      "name": "Participant 2 actual WAV transcription",
+      "passed": true,
+      "transcript": "I lose focus when I switch between task tools. I work alone and already know my priorities, so I do not need another shared dashboard."
+    },
+    {
+      "name": "Participant 2 actual WAV transcription",
+      "passed": true,
+      "transcript": "My biggest problem is getting interrupted by Slack notifications. I would rather pay for a quiet focus timer than automate status updates."
+    },
+    {
+      "name": "Participant 2 grounded analysis",
+      "passed": true,
+      "findings": 4
+    },
+    {
+      "name": "Independent personalized follow-ups",
+      "passed": true,
+      "outputs": [
+        "Hi, I'm Persona's AI interviewer. Thanks for joining. Can you walk me through how you currently keep track of your tasks and let your manager or team know what you’re working on?",
+        "Thanks for sharing that. What aspects of your current status‑update process are most frustrating or time‑consuming?",
+        "When you need to know what a teammate is working on, how do you find that information and what challenges do you encounter?",
+        "Hi, I'm an AI interviewer from Persona. Thanks for joining. Can you walk me through how you currently keep track of your tasks and let your manager or team know what you’re working on?",
+        "You mentioned losing focus when switching between task tools. Could you walk me through a recent instance where you had to switch tools and how that affected your workflow?",
+        "Thanks for sharing that. Can you describe a recent situation where a Slack notification interrupted you while working on a task? What was the impact on your progress?"
+      ]
+    },
+    {
+      "name": "Combined intelligence and independent verification",
+      "passed": true,
+      "participantCount": 2,
+      "themes": 8,
+      "recommendations": 4
+    },
+    {
+      "name": "Grounded research assistant",
+      "passed": true,
+      "evidenceReferences": 4,
+      "answer": "The participants report two main frustrations: (1) frequent interruptions from Slack notifications that break focus, and (2) the time‑consuming manual effort required to keep task information synchronized across tools (e.g., copying tasks between Slack and a spreadsheet, leading to missed deadlines). To address these issues, the next investigation should explore solutions that (a) reduce or manage Slack interruptions (such as a quiet focus timer or status‑automation features) and (b) streamline task synchronization by providing an automatically updating, single view of priorities with minimal setup time."
+    }
+  ],
+  "workspaceId": "cd4c29bf-54e6-4eb6-84d6-d24283d6f819",
+  "campaignId": "6ceab9ca-0934-4182-84fc-b3042f3f8ed4",
+  "passed": true,
+  "agentExecutions": [
+    {
+      "agent": "Adaptive Reasoning Agent",
+      "status": "completed",
+      "executions": 7
+    },
+    {
+      "agent": "Evidence Verification Agent",
+      "status": "completed",
+      "executions": 2
+    },
+    {
+      "agent": "Interview Analyst",
+      "status": "completed",
+      "executions": 2
+    },
+    {
+      "agent": "Product Strategy Agent",
+      "status": "completed",
+      "executions": 1
+    },
+    {
+      "agent": "Research Intelligence Agent",
+      "status": "completed",
+      "executions": 2
+    },
+    {
+      "agent": "Research Strategist",
+      "status": "completed",
+      "executions": 1
+    },
+    {
+      "agent": "Voice Interviewer",
+      "status": "failed",
+      "executions": 1
+    },
+    {
+      "agent": "Voice Interviewer",
+      "status": "completed",
+      "executions": 6
+    }
+  ]
+}
