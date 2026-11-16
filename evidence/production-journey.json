@@ -1,0 +1,65 @@
+{
+  "base": "https://persona-research-beta.onrender.com",
+  "verifiedAt": "2026-11-16T08:59:14.517Z",
+  "checks": [
+    {
+      "name": "fresh guest workspace with genuine zero metrics",
+      "passed": true
+    },
+    {
+      "name": "AI campaign generation and review/edit/save",
+      "passed": true,
+      "questionCount": 6
+    },
+    {
+      "name": "published shared interview link",
+      "passed": true,
+      "campaignId": "0b8e9672-cf51-4187-a037-c6f79d27e8c5"
+    },
+    {
+      "name": "two independent MediaRecorder/Groq voice interviews with personalized followups",
+      "passed": true,
+      "participants": [
+        {
+          "id": "ccce7382-9a7f-49eb-80fb-9a582792d6b4",
+          "transcription": "As a remote worker, I struggle with switching between too many tools. I spend an hour each day updating tasks. I would pay for one simple place to see priorities and focus on important work.",
+          "followUp": "Thanks for sharing that. Which specific tools do you use for task coordination, and can you give an example of a recent situation where switching between them caused a delay or confusion?",
+          "audioPlayback": [],
+          "independentContext": true
+        },
+        {
+          "id": "0e0f0afb-be94-4488-92ad-e03cace61a91",
+          "transcription": "I manage a small remote team. Our biggest problem is unclear priorities, not tools. We use one shared document and it works. I would pay for better planning, but not another task app. I manage a small remote team.",
+          "followUp": "Thanks for sharing that. Could you give a concrete example of a recent project where unclear priorities caused a problem for your team, and how you tried to resolve it?",
+          "audioPlayback": [],
+          "independentContext": true
+        }
+      ]
+    },
+    {
+      "name": "recoverable jobs, combined findings and exact quotes",
+      "passed": true,
+      "participantCount": 2,
+      "themes": 7
+    },
+    {
+      "name": "persisted research assistant grounded in actual evidence",
+      "passed": true
+    },
+    {
+      "name": "real PDF/CSV downloads, public sharing/revocation and unauthorized isolation",
+      "passed": true
+    },
+    {
+      "name": "workspace and interviews persist after refresh; genuine agent history",
+      "passed": true
+    },
+    {
+      "name": "mobile responsive landing and mobile second interview",
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "passed": true,
+  "limits": "Synthetic spoken WAV injected into Chromium microphone; real hardware, Safari and iOS playback not independently tested."
+}
