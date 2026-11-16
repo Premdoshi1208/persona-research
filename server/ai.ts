@@ -272,11 +272,21 @@ export async function speech(text: string, workspaceId: string) {
   const segments: Buffer[] = [];
   for (const part of splitSpeech(text)) {
     await reserveUsage(workspaceId, 'tts', model, part.length);
-    try {
-      // Groq's current Orpheus API accepts at most 200 characters per request.
-      const response = await client().audio.speech.create({ model, input: part, voice: process.env.GROQ_TTS_VOICE || 'autumn', response_format: 'wav' });
-      segments.push(Buffer.from(await response.arrayBuffer()));
-    } catch (error) { throw safeProviderError(error); }
+    let last: any;
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        // Groq's current Orpheus API accepts at most 200 characters per request.
+        const response = await client().audio.speech.create({ model, input: part, voice: process.env.GROQ_TTS_VOICE || 'autumn', response_format: 'wav' });
+        segments.push(Buffer.from(await response.arrayBuffer()));
+        last = undefined;
+        break;
+      } catch (error: any) {
+        last = error;
+        if (![408, 429, 500, 502, 503, 504].includes(Number(error?.status)) || attempt === MAX_RETRIES) break;
+        await new Promise(resolve => setTimeout(resolve, retryDelay(error, attempt)));
+      }
+    }
+    if (last) throw safeProviderError(last);
   }
   return { segments, contentType: 'audio/wav' as const, provider: 'groq' as const };
 }
@@ -287,10 +297,18 @@ export async function transcribe(buffer: Buffer, mimetype: string, workspaceId: 
   const model = process.env.GROQ_STT_MODEL || 'whisper-large-v3-turbo';
   await reserveUsage(workspaceId, 'stt', model, buffer.length);
   const extension = mimetype.includes('mp4') ? 'mp4' : mimetype.includes('wav') ? 'wav' : mimetype.includes('ogg') ? 'ogg' : 'webm';
-  try {
-    const response = await client().audio.transcriptions.create({ model, file: await toFile(buffer, `response.${extension}`, { type: mimetype }), response_format: 'json', language: 'en', temperature: 0 });
-    const text = response.text.trim();
-    if (!text || text.length < 2) throw new ProviderError('I could not hear a response. Please try recording again or type your answer.', 422, 'NO_SPEECH');
-    return { text };
-  } catch (error) { throw safeProviderError(error); }
+  let last: any;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await client().audio.transcriptions.create({ model, file: await toFile(buffer, `response.${extension}`, { type: mimetype }), response_format: 'json', language: 'en', temperature: 0 });
+      const text = response.text.trim();
+      if (!text || text.length < 2) throw new ProviderError('I could not hear a response. Please try recording again or type your answer.', 422, 'NO_SPEECH');
+      return { text };
+    } catch (error: any) {
+      last = error;
+      if (![408, 429, 500, 502, 503, 504].includes(Number(error?.status)) || attempt === MAX_RETRIES) break;
+      await new Promise(resolve => setTimeout(resolve, retryDelay(error, attempt)));
+    }
+  }
+  throw safeProviderError(last);
 }
