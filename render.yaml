@@ -48,4 +48,4 @@ services:
       - key: MAX_LLM_OUTPUT_TOKENS
         value: '6000'
       - key: AGENT_ATTEMPTS
-        value: '2'
+        value: '3'

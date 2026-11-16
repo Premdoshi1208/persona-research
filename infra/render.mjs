@@ -32,26 +32,36 @@ if (action === 'inspect') {
   const quotaDefaults = {
     DAILY_GLOBAL_AI_REQUESTS: '1500', DAILY_WORKSPACE_AI_REQUESTS: '200',
     MAX_INTERVIEW_TURNS: '10', MAX_CONCURRENT_INTERVIEWS: '5', MAX_AUDIO_MB: '12',
+      MAX_AUDIO_BYTES: '12582912', DAILY_GLOBAL_SPEECH_CHARACTERS: '75000',
+      DAILY_WORKSPACE_SPEECH_CHARACTERS: '20000', MAX_LLM_OUTPUT_TOKENS: '6000', AGENT_ATTEMPTS: '3',
+    };
+    for (const [key, value] of Object.entries(quotaDefaults)) envVars.push({ key, value: process.env[key] || value });
+    envVars.push({ key: 'NODE_ENV', value: 'production' }, { key: 'NODE_VERSION', value: '22.16.0' });
+    const result = await api('/services', 'POST', {
+      type: 'web_service', name: 'persona-research-beta', ownerId: state.render_owner_id,
+      repo: state.source_repository, branch: 'main', autoDeployTrigger: 'off', envVars,
+      serviceDetails: { runtime: 'node', plan: 'free', region: 'oregon', numInstances: 1,
+        healthCheckPath: '/api/health', envSpecificDetails: { buildCommand: 'npm ci --include=dev && npm run build', startCommand: 'npm start' } },
+    });
+    const service = result.service || result;
+    state.render_service_id = service.id;
+    state.render_service_url = service.serviceDetails?.url;
+    state.render_plan = service.serviceDetails?.plan;
+    state.render_deploy_id = result.deployId;
+    await save();
+    console.log(JSON.stringify({ id: state.render_service_id, url: state.render_service_url, plan: state.render_plan, deployId: state.render_deploy_id }, null, 2));
+} else if (action === 'deploy') {
+  if (!state.render_service_id) throw new Error('Create dedicated service first');
+  const envVars = ['DATABASE_URL', 'GROQ_API_KEY', 'SESSION_SECRET', 'GROQ_REASONING_MODEL', 'GROQ_CONVERSATION_MODEL', 'GROQ_STT_MODEL', 'GROQ_TTS_MODEL', 'GROQ_TTS_VOICE'].filter(key => process.env[key]).map(key => ({ key, value: process.env[key] }));
+  const quotaDefaults = {
+    DAILY_GLOBAL_AI_REQUESTS: '1500', DAILY_WORKSPACE_AI_REQUESTS: '200',
+    MAX_INTERVIEW_TURNS: '10', MAX_CONCURRENT_INTERVIEWS: '5', MAX_AUDIO_MB: '12',
     MAX_AUDIO_BYTES: '12582912', DAILY_GLOBAL_SPEECH_CHARACTERS: '75000',
-    DAILY_WORKSPACE_SPEECH_CHARACTERS: '20000', MAX_LLM_OUTPUT_TOKENS: '6000', AGENT_ATTEMPTS: '2',
+    DAILY_WORKSPACE_SPEECH_CHARACTERS: '20000', MAX_LLM_OUTPUT_TOKENS: '6000', AGENT_ATTEMPTS: '3',
   };
   for (const [key, value] of Object.entries(quotaDefaults)) envVars.push({ key, value: process.env[key] || value });
   envVars.push({ key: 'NODE_ENV', value: 'production' }, { key: 'NODE_VERSION', value: '22.16.0' });
-  const result = await api('/services', 'POST', {
-    type: 'web_service', name: 'persona-research-beta', ownerId: state.render_owner_id,
-    repo: state.source_repository, branch: 'main', autoDeployTrigger: 'off', envVars,
-    serviceDetails: { runtime: 'node', plan: 'free', region: 'oregon', numInstances: 1,
-      healthCheckPath: '/api/health', envSpecificDetails: { buildCommand: 'npm ci --include=dev && npm run build', startCommand: 'npm start' } },
-  });
-  const service = result.service || result;
-  state.render_service_id = service.id;
-  state.render_service_url = service.serviceDetails?.url;
-  state.render_plan = service.serviceDetails?.plan;
-  state.render_deploy_id = result.deployId;
-  await save();
-  console.log(JSON.stringify({ id: state.render_service_id, url: state.render_service_url, plan: state.render_plan, deployId: state.render_deploy_id }, null, 2));
-} else if (action === 'deploy') {
-  if (!state.render_service_id) throw new Error('Create dedicated service first');
+  await api(`/services/${state.render_service_id}/env-vars`, 'PUT', envVars);
   const result = await api(`/services/${state.render_service_id}/deploys`, 'POST', { clearCache: process.argv.includes('--clear-cache') ? 'clear' : 'do_not_clear' });
   state.render_deploy_id = result.id; await save();
   console.log(JSON.stringify({ deployId: result.id, status: result.status }, null, 2));
