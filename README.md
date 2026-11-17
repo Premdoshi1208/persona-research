@@ -1,130 +1,209 @@
+<div align="center">
+
 # Persona
 
-**Customer research that runs itself.**
+### Customer research that runs itself.
 
-Persona is a free public beta for creating research campaigns, conducting adaptive AI voice interviews, and turning participant responses into evidence-backed findings. Researchers can start in a private guest workspace, publish an interview link, review transcripts and analysis, ask research questions, and export or share a report. Participants do not need accounts.
+**An end-to-end AI research platform that turns customer conversations into evidence-backed product decisions.**
 
-Deployment and acceptance status are recorded in [EXECUTION_STATUS.md](EXECUTION_STATUS.md). That file and the timestamped files in `evidence/` distinguish completed checks from pending checks. A source build or a live provider test alone is not a claim that the public customer journey passed.
+[**Try Persona live**](https://persona-research-beta.onrender.com) · [**How it works**](#how-it-works) · [**System architecture**](#system-architecture) · [**Run locally**](#run-locally)
 
-## Run locally
+**Public beta** · **Voice + text interviews** · **Seven specialized AI agents** · **Research with traceable evidence**
 
-Requirements: Node.js 22+, npm, a PostgreSQL database, and a Groq API key whose account can use the configured models. No Redis or email service is required.
+</div>
 
-```sh
-npm ci
-cp .env.example .env
-# Set DATABASE_URL and GROQ_API_KEY in the ignored .env file.
-npm run dev
+![Persona research workspace showing an example campaign](docs/product-overview.png)
+
+> **The idea in one sentence:** Describe what you want to learn, share an interview link with your customers, and let Persona interview them, analyze their feedback, and show you what matters—with supporting quotes.
+
+## Why Persona?
+
+Customer discovery often means scheduling interviews, taking notes, sorting transcripts, comparing recurring complaints, and preparing a report. Persona brings that workflow into one product:
+
+- **For a company:** create a research campaign from a plain-English goal; edit and publish a tailored interview plan.
+- **For a participant:** open a public link and have a guided, turn-by-turn AI interview by voice or text, without creating an account.
+- **For a decision-maker:** review themes, supporting transcript evidence, prioritized improvement ideas, and downloadable research reports.
+
+Persona is **not** a synthetic-customer simulator. Its findings come from conversations conducted with participants. Like any qualitative research tool, its recommendations are hypotheses to validate—not proof of what an entire market thinks.
+
+## How it works
+
+| Step | What happens | Example |
+| --- | --- | --- |
+| **1. Describe the research goal** | A company enters its product, audience, and research question. | “Why do shoppers abandon their carts?” |
+| **2. Generate and review a plan** | The Research Strategist drafts objectives, assumptions, and open-ended questions. | Pricing, shipping, reviews, checkout friction. |
+| **3. Publish and share** | Persona creates a public interview link and QR code. | A participant opens the link on their phone or laptop. |
+| **4. Interview customers** | Persona asks a question, transcribes voice or accepts text, and chooses relevant follow-ups. | “How did the delivery fee affect your decision?” |
+| **5. Synthesize evidence** | Agents classify findings, group themes, and check quotes against transcripts. | Delivery-cost surprise, trust in reviews. |
+| **6. Make decisions** | The dashboard shows evidence-backed insights, Ask Persona answers, recommendations, and PDF/CSV exports. | Test upfront total-cost visibility. |
+
+### Try the complete flow
+
+1. Open [the live application](https://persona-research-beta.onrender.com) and create a research campaign in a guest workspace.
+2. Review the generated interview questions, then **Publish campaign**.
+3. Open the public interview link in another tab or device and complete a short voice or text interview.
+4. Return to the workspace to inspect **Interviews → Research analysis → Insights → Ask Persona → Reports → Agent activity**.
+5. Check whether each finding is supported by the participant's actual words. Repeat with different participants to see cross-interview themes emerge.
+
+**Demo note:** The illustrated Amazon cart-abandonment campaign is fictional test research. Persona is not affiliated with Amazon, and demo answers should not be presented as real Amazon customer data.
+
+## System architecture
+
+Persona runs as a single web application and API hosted on **Render**, with **Groq** for AI inference and speech, and **Neon PostgreSQL** for durable application state.
+
+![Simple Persona system architecture](docs/architecture.png)
+
+<details>
+<summary><strong>Editable architecture diagram (Mermaid)</strong></summary>
+
+```mermaid
+flowchart TB
+    R["Company / Researcher"] --> UI["Persona Web App<br/>React + TypeScript + Vite"]
+    P["Customer / Participant"] --> UI
+    UI -->|HTTPS| API["Node.js + Express Backend<br/>Sessions · APIs · Quotas"]
+    API --> ORCH["Seven-Agent Workflow<br/>Plan · Interview · Analyze · Verify"]
+    API <--> DB[("Neon PostgreSQL<br/>Campaigns · Transcripts · Jobs · Evidence")]
+    API <--> AI["Groq AI<br/>LLMs · Whisper STT · Orpheus TTS"]
+    ORCH <--> DB
+    ORCH <--> AI
+    ORCH --> OUT["Insights · Ask Persona · PDF / CSV"]
+    OUT --> UI
+    style UI fill:#eee8ff,stroke:#8a68e0,color:#252038
+    style API fill:#e8e3f7,stroke:#a18dcc,color:#252038
+    style ORCH fill:#f4f0ff,stroke:#a18dcc,color:#252038
+    style DB fill:#e7f7ee,stroke:#7cba9e,color:#252038
+    style AI fill:#e7f3ff,stroke:#84bde7,color:#252038
 ```
 
-Open `http://localhost:3000`. Startup applies the idempotent PostgreSQL migration under an advisory lock before accepting requests. Development uses the same Express API and PostgreSQL database as production, with Vite middleware for the client.
+</details>
 
-For a production build:
+**In plain English:** The browser talks to the backend. The backend manages sessions, research workflows, data, and API access. AI steps use Groq. Completed work and its evidence are stored in PostgreSQL. The dashboard reads those results; the model itself is not the database.
 
-```sh
-npm run build
-npm start
-```
+For a deeper explanation of the interview pipeline, agent orchestration, persistence, and failure handling, see [**Architecture notes →**](docs/ARCHITECTURE.md).
 
-Set `NODE_ENV=production` and `APP_URL` to the actual HTTPS origin in production. All browser requests use the same origin. Never place credentials in a `VITE_` environment variable, the client, the repository, or a deployment URL.
+## Seven specialized agents
 
-## Architecture
-
-One Node/Express service serves the React/TypeScript/Vite client and the API. PostgreSQL stores workspace records, users and sessions, consent, campaigns, interview messages, analyses, evidence, assistant conversations, reports, usage reservations, execution records, and recoverable jobs. Parameterized `pg` queries and an explicit SQL migration avoid a generated ORM client and keep the one-service deployment small.
-
-Relevant source:
-
-- `server/index.ts`: same-origin HTTP API, authentication flows, campaign lifecycle, participant sessions, exports, and service startup.
-- `server/security.ts`: workspace sessions, CSRF/origin checks, scoped ownership checks, and persistent rate buckets.
-- `server/ai.ts`: Groq SDK calls, typed agent outputs, exact-quote validation, research synthesis, retrieval, and speech.
-- `server/jobs.ts`: PostgreSQL job claims, leases, retries, and analysis orchestration.
-- `server/schema.sql`: relational schema, foreign keys, uniqueness constraints, and full-text search indexes.
-- `server/reports.ts`: real PDF/CSV generation and restricted public report views.
-- `client/`: the landing page, private workspace, public interview room, reports, and settings.
-
-The browser records one participant turn with `MediaRecorder`, uploads that audio for Groq transcription, and submits the transcript for adaptive reasoning and interviewer generation. Generated Groq WAV audio then plays in the browser. Microphone tracks are released before playback and after each response. This is a turn-based voice conversation. A clearly disclosed browser-speech fallback is available when Groq audio cannot be generated; text input is also available.
-
-## Seven independently executed agents
-
-Each row below is a separate bounded model invocation with its own input, Zod-validated output, and persisted execution status. The activity center reads actual execution records; it does not stream private model reasoning.
+Persona separates the research workflow into distinct responsibilities rather than asking one general-purpose chatbot to do everything.
 
 | Agent | Responsibility |
 | --- | --- |
-| Research Strategist | Creates objectives, assumptions, neutral questions, an interview strategy, and success criteria. |
-| Adaptive Reasoning Agent | Reviews the interview so far, selects a personalized follow-up or next question, and decides when to finish. |
-| Voice Interviewer | Converts that plan into one short, natural spoken interview turn. |
-| Interview Analyst | Extracts findings and objective coverage with exact participant-message references. |
-| Research Intelligence Agent | Groups findings across completed interviews and answers research questions from retrieved evidence. |
-| Product Strategy Agent | Proposes prioritized actions whose rationale references observed themes. |
-| Evidence Verification Agent | Independently rejects unsupported themes, executive summaries, recommendation rationale, and research-assistant claims. |
+| **01 · Research Strategist** | Turns a research brief into objectives, assumptions, questions, and a follow-up plan. |
+| **02 · Voice Interviewer** | Produces natural, focused interview turns, one question at a time. |
+| **03 · Adaptive Reasoning** | Uses earlier answers and research objectives to decide what to ask next. |
+| **04 · Interview Analyst** | Extracts pain points, needs, positive feedback, requests, and transcript evidence. |
+| **05 · Research Intelligence** | Groups findings across interviews, highlights differing views, and supports research Q&A. |
+| **06 · Product Strategy** | Produces prioritized improvement suggestions, rationale, and next steps. |
+| **07 · Evidence Verification** | Checks that research claims and citations are supported by source transcripts. |
 
-GPT OSS models use strict JSON Schema output. Application code validates every output again. Quotes must be exact substrings of actual participant messages; fabricated message IDs, paraphrases presented as quotations, and interviewer quotations are discarded. Supporting-interview counts and percentages are calculated from distinct interview IDs in code, never accepted from a model. Findings and suggested actions remain separately labeled, and reports state the limits of qualitative research.
+These are **logical AI workflow stages**, not seven separately hosted servers. Individual executions are visible in the application's **Agent activity** page.
 
-Completed stages are reused only for the same workspace, campaign/interview, input, model, prompt, and output schema. A later provider failure can therefore resume without paying to replay earlier completed stages. Agent calls time out after 60 seconds and allow at most two attempts. Background jobs allow three attempts, claim work using `FOR UPDATE SKIP LOCKED`, renew a PostgreSQL lease while working, and recover stale work after two minutes. A per-campaign advisory lock serializes synthesis across service instances. Final insight writes recheck and lock the source interviews so a concurrent withdrawal cannot restore deleted evidence.
+## Technology
 
-Ask Persona retrieves participant messages using PostgreSQL full-text ranking within the current workspace. A second agent verifies its answer, and returned evidence links point to real source messages. An empty research workspace produces an explicit insufficient-evidence response without an AI request.
+| Layer | Stack | Role |
+| --- | --- | --- |
+| Web experience | React 19, TypeScript, Vite | Campaign builder, participant interview room, dashboards. |
+| Application API | Node.js, Express 5 | Authentication, authorization, workflows, limits, exports. |
+| Model inference | Groq-hosted GPT-OSS models | Question planning, follow-ups, analysis, synthesis, verification. |
+| Speech-to-text | Groq Whisper | Converts recorded participant audio into text. |
+| Text-to-speech | Groq Orpheus; browser speech fallback | Speaks interview questions when available. |
+| Database | Neon PostgreSQL | Workspaces, sessions, campaigns, transcripts, agent runs, evidence, background jobs. |
+| Hosting | Render | Unified HTTPS deployment for frontend and backend. |
+| Validation | TypeScript checks, automated tests, Playwright | API, voice, and browser acceptance coverage. |
 
-## Configuration and cost controls
+*Stack and implemented safeguards are described in the initial build report. This document is based on that report and manual product testing; it does not replace an independent source-code or security audit.*
 
-`.env.example` contains the canonical variable names. Never pass Render or Neon control-plane API keys to the web service; its runtime needs only the PostgreSQL connection and Groq credentials.
+## Inside the interview pipeline
 
-| Variable | Public beta configuration |
-| --- | --- |
-| `GROQ_REASONING_MODEL` | `openai/gpt-oss-120b` |
-| `GROQ_CONVERSATION_MODEL` | `openai/gpt-oss-20b` |
-| `GROQ_STT_MODEL` | `whisper-large-v3-turbo` |
-| `GROQ_TTS_MODEL` | `canopylabs/orpheus-v1-english` |
-| `GROQ_TTS_VOICE` | `autumn` |
-| `DAILY_GLOBAL_AI_REQUESTS` | 1,500 attempted LLM/STT/TTS calls per UTC day |
-| `DAILY_WORKSPACE_AI_REQUESTS` | 200 attempted calls per workspace per UTC day |
-| `DAILY_GLOBAL_SPEECH_CHARACTERS` | 75,000 generated-speech input characters per UTC day |
-| `DAILY_WORKSPACE_SPEECH_CHARACTERS` | 20,000 speech characters per workspace per UTC day |
-| `MAX_LLM_OUTPUT_TOKENS` | 6,000; conversational calls are additionally capped at 1,800 |
-| `MAX_INTERVIEW_TURNS` | 10 participant responses |
-| `MAX_CONCURRENT_INTERVIEWS` | 5 in the example configuration |
-| `MAX_AUDIO_MB` / `MAX_AUDIO_BYTES` | 12 MB; the byte limit takes precedence in transcription |
-| `AGENT_ATTEMPTS` | 2 maximum, including the initial attempt |
-
-The beta additionally allows three campaigns per workspace and up to twelve participants per researcher-created campaign. Campaign duration is configurable from two to twenty minutes. Per-IP, authentication, participant, campaign-generation, speech, assistant, and regeneration limits protect public endpoints. Quota reservations are atomic across processes and occur before contacting the provider; failed attempts count. LLM usage records include reported token totals, speech records include input characters, and transcription records include uploaded bytes. They are usage measurements rather than an invoice estimator.
-
-Groq provider rate limits can be lower than application allowances. Provider 429 errors are handled with bounded backoff and clear retry messages; background jobs retry later. Request/character allowances are not an exact currency spending cap. Hosting uses free service/database plans; Groq processing uses the existing account's billing and provider limits. No payments or automatic paid upgrades are implemented.
-
-Orpheus accepts at most 200 input characters per call. The application splits speech into segments of at most 190 characters and merges compatible PCM WAV segments for playback. The account owner may need to accept the model provider terms in the Groq console before first use.
-
-Official provider references: [Groq models](https://console.groq.com/docs/models), [structured outputs](https://console.groq.com/docs/structured-outputs), [speech recognition](https://console.groq.com/docs/speech-to-text), and [Orpheus speech generation](https://console.groq.com/docs/text-to-speech/orpheus).
-
-## Security, privacy, and retention
-
-- Passwords and recovery codes use bcrypt. Login sessions use random tokens whose hashes are stored in PostgreSQL; production cookies are HTTP-only, Secure, and SameSite=Lax. State-changing workspace requests require CSRF tokens. Origin checks reject cross-origin mutation requests.
-- Every private API operation checks a workspace session and ownership. Participant access uses an independent scoped bearer token. Public campaign/report links use cryptographically random tokens; shared reports can be revoked.
-- Zod validation, parameterized SQL, secure headers, a restrictive content-security policy, upload type/signature/size checks, and rate limits protect input paths. Campaign and participant text is treated as untrusted data inside agent instructions. Models cannot access application credentials or run arbitrary SQL.
-- Participant consent is recorded before interviewing. Participants can decline, stop, or withdraw and delete their interview. Withdrawal deletes the transcript, clears derived research and assistant history, revokes report sharing, and schedules current-data analysis.
-- Uploaded participant audio is sent to Groq from memory and is not permanently stored by Persona. Generated interviewer audio may be cached in PostgreSQL for playback and is cleaned up after seven days. Groq also processes campaign descriptions, interview text, and research requests; its own provider data policies apply.
-- Guest workspace access expires after thirty days. Expired guest data is removed by periodic cleanup while the service is running; free-service sleep can delay physical cleanup. Registered workspace data remains until deletion, subject to hosting/database availability and quotas. Workspace/account deletion cascades through its dependent product data.
-- Account recovery uses a one-time recovery code displayed at registration and rotated on recovery. There is no email provider, email verification, or email reset delivery. Save the recovery code. A guest workspace without an account depends on its browser session.
-- Public reports omit transcripts, participant identifiers, exact quotations, and detailed research notes. They expose selected aggregate theme titles/counts and suggested-action titles. Private downloads contain the researcher's actual data.
-
-No regulatory certification or compliance claim is made. Avoid entering sensitive personal information or confidential material into this public beta.
-
-## Verification
-
-```sh
-npm test             # Unit and real PostgreSQL API/database tests; no live AI traffic
-npm run typecheck
-npm run lint
-npm run build
-npm run test:live    # REAL Groq requests and PostgreSQL writes; consumes provider allowance
-npm run test:e2e     # Browser acceptance suite; see its configured target and fixtures
+```text
+Customer speaks or types
+        ↓
+Browser records a response (audio or text)
+        ↓
+Backend validates and stores the interview turn
+        ↓
+Groq Whisper transcribes audio, when audio is used
+        ↓
+Adaptive Reasoning + Voice Interviewer choose the next question
+        ↓
+Question is displayed and optionally spoken
+        ↓
+After completion: Analyze → Group themes → Recommend → Verify evidence
+        ↓
+Insights / Ask Persona / PDF and CSV reports
 ```
 
-`npm run test:live -- --resume` resumes the dedicated workspace from `evidence/agents-live.json` after a provider interruption. The live check creates a clearly identified, expiring QA workspace, uses two independent synthetic spoken fixtures through real Groq TTS/STT, runs adaptive interviews and all seven agents, and verifies combined findings and research-assistant references. Failure writes evidence and returns a nonzero process exit status. It does not manufacture successful provider results.
+The application is **turn-based**, not an always-listening, full-duplex voice call. The voice interface also supports text responses. When generated speech is unavailable, the product can disclose and use browser speech synthesis as a fallback.
 
-The WAV fixtures in `tests/fixtures/` are generated test speech, not real customer recordings. Fixture-based microphone tests verify a browser audio path; they do not prove that every physical microphone, mobile browser, Bluetooth device, speaker, or operating-system permission flow works. Provider tests alone do not verify audible playback on a user's device. Browser and public-deployment checks must be reported separately. Current evidence and any remaining gaps belong in `EXECUTION_STATUS.md` and `evidence/`.
+## Trust, privacy, and research quality
 
-## Deployment and operating limits
+The delivered implementation includes:
 
-`render.yaml` describes the unified Node service. [infra/README.md](infra/README.md) documents the dedicated Render/Neon deployment workflow, source repository, model-term prerequisite, and hosting limitations. The ignored `infra/state.json` records actual provisioned resource IDs and deployment state; credentials remain in environment variables.
+- **Explicit participant consent** before an interview; a participant can withdraw and request deletion from the interview flow.
+- **Workspace-scoped access controls** so research data belongs to its owning workspace.
+- **Session and CSRF protections** for private application actions.
+- **Ephemeral audio handling:** audio is processed for transcription and is not intended to be stored permanently.
+- **Source-linked findings:** quotes are checked against stored transcript messages, with visible evidence links.
+- **Careful conclusions:** interview counts are counts of actual supporting interviews; AI suggestions are marked as suggestions.
 
-Render Free can sleep after inactivity, causing a cold start and pausing the worker until the service wakes. The process filesystem is ephemeral; product data and jobs remain in PostgreSQL. Neon Free can suspend idle compute and has storage, compute, transfer, and recovery-history limits. The selected Neon database does not inherit Render Free PostgreSQL's thirty-day expiry, but free hosting is not an uptime or indefinite-retention guarantee. No paid backup plan, always-on compute, or paid infrastructure upgrade has been provisioned.
+**Research limitation:** A handful of self-selected interviews cannot establish population-level percentages or a statistically representative result. Validate major decisions with additional research and experiments.
 
-Read the current official [Render free-service limits](https://render.com/docs/free) and [Neon plan limits](https://neon.com/docs/introduction/plans) before changing infrastructure. A production deployment is accepted only after the real public HTTPS journey has been tested; do not substitute a plausible URL or localhost result.
+## Run locally
+
+**Prerequisites:** a recent Node.js installation, npm, a PostgreSQL connection, and a Groq API credential.
+
+```bash
+git clone https://github.com/Premdoshi1208/persona-research.git
+cd persona-research
+npm ci
+cp .env.example .env
+```
+
+Set the environment variables documented in [`.env.example`](.env.example), keeping credentials server-side. **Never commit `.env` or API keys.** Inspect the available scripts with `npm run`, then start the development server using the script declared in `package.json` (typically `npm run dev`).
+
+### Checks
+
+The initial release report documents these scripts:
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+```
+
+`npm run test:live` runs live provider integration tests and can consume Groq API usage; run it only when intentionally testing real model/speech calls.
+
+### Deployment
+
+The repository includes [`render.yaml`](render.yaml) for Render deployment configuration. The database is hosted separately on Neon; persistent application data and recoverable workflow jobs are not intended to depend on Render's ephemeral filesystem.
+
+A health endpoint is exposed at [`/api/health`](https://persona-research-beta.onrender.com/api/health). Availability can vary while the free-tier service wakes up or when provider quotas are reached.
+
+## Repository layout
+
+```text
+client/            React user interface
+server/            Application backend and AI orchestration
+evidence/          Test and release evidence
+infra/             Deployment and infrastructure support
+public/            Public/static assets
+tests/             Automated tests
+.env.example       Configuration template
+render.yaml        Render deployment specification
+package.json       Scripts and dependencies
+```
+
+## What is ready, and what's next?
+
+**Implemented and manually exercised:** campaign generation, publishing, public interview participation, transcript persistence, per-interview analysis, multi-agent execution history, campaign insights, Ask Persona, and downloadable research reports.
+
+**Beta limitations worth testing further:** cold-start delays on free hosting, speech-provider quotas and fallbacks, occasional slow interview turns, mobile/browser compatibility, and load testing under real concurrency. The live product is a **public beta**, not a claim of enterprise certification or a formal security audit.
+
+---
+
+<div align="center">
+
+**Listen to customers. Understand the evidence. Build what matters.**
+
+[**Launch Persona ↗**](https://persona-research-beta.onrender.com)
+
+</div>

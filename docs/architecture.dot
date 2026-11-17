@@ -1,0 +1,41 @@
+digraph Persona {
+  graph [
+    label="PERSONA  |  SYSTEM AT A GLANCE",
+    labelloc=t,
+    labeljust=l,
+    fontsize=30,
+    fontname="DejaVu Sans Bold",
+    fontcolor="#1F1A35",
+    bgcolor="#FCFBFF",
+    pad="0.38",
+    ranksep="0.70",
+    nodesep="0.6",
+    splines="spline",
+    outputorder="edgesfirst"
+  ];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=17, fontcolor="#2C2541", margin="0.26,0.18", penwidth=1.4, color="#E0DAEF", fillcolor="#FFFFFF"];
+  edge [color="#8A7DB8", penwidth=2.1, arrowsize=0.75];
+
+  company [label="COMPANY / RESEARCHER\nCreates campaign · Reviews findings", fillcolor="#F0ECFF", color="#C6B5F4"];
+  customer [label="CUSTOMER / PARTICIPANT\nOpens link · Speaks or types", fillcolor="#F0ECFF", color="#C6B5F4"];
+  { rank=same; company; customer; }
+
+  web [label="PERSONA WEB APP\nReact + TypeScript + Vite\nCampaigns · Interviews · Insights · Reports", fillcolor="#E8E2FF", color="#987DE9", penwidth=2.2, fontsize=19];
+  api [label="APPLICATION BACKEND\nNode.js + Express\nSessions · APIs · Quotas · Orchestration", fillcolor="#EAE7F5", color="#B8AEDD", penwidth=1.8, fontsize=19];
+  agents [label="SEVEN SPECIALIZED AI AGENTS\nPlan → Interview → Analyze → Synthesize\nRecommend → Verify", fillcolor="#F2EEFF", color="#A99BDB", penwidth=2.0, fontsize=18];
+
+  groq [label="GROQ AI\nLLMs · Whisper speech-to-text\nOrpheus text-to-speech", fillcolor="#E9F5FF", color="#B5DCF4"];
+  neon [label="NEON POSTGRESQL\nWorkspaces · Campaigns · Transcripts\nFindings · Agent runs · Background jobs", fillcolor="#EBF8F1", color="#B7DFC6"];
+  { rank=same; groq; agents; neon; }
+  out [label="BUSINESS OUTPUT\nEvidence-backed themes · Ask Persona · PDF / CSV", fillcolor="#F0ECFF", color="#B7A1EF", penwidth=1.8];
+
+  company -> web;
+  customer -> web;
+  web -> api [label="HTTPS", fontsize=13, fontname="DejaVu Sans", fontcolor="#7C718F"];
+  api -> agents [label="workflow", fontsize=13, fontname="DejaVu Sans", fontcolor="#7C718F"];
+  api -> groq [label="speech & AI", fontsize=13, fontname="DejaVu Sans", fontcolor="#7C718F"];
+  api -> neon [label="persist state", fontsize=13, fontname="DejaVu Sans", fontcolor="#7C718F"];
+  agents -> out [label="verified findings", fontsize=13, fontname="DejaVu Sans", fontcolor="#7C718F"];
+  groq -> agents [style=dashed, arrowhead=none, color="#BDD3EC", constraint=false];
+  neon -> agents [style=dashed, arrowhead=none, color="#B9D9CB", constraint=false];
+}
